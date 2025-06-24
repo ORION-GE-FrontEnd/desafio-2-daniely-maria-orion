@@ -1,0 +1,22 @@
+[
+  {
+    "titulo": "A fazer",
+    "exibirBotaoCriarTarefas": true,
+    "corDeFundo": "bg-pink-200"
+  },
+  {
+    "titulo": "Em Andamento",
+    "exibirBotaoCriarTarefas": true,
+    "corDeFundo": "bg-yellow-100"
+  },
+  {
+    "titulo": "Em Revisão",
+    "exibirBotaoCriarTarefas": true,
+    "corDeFundo": "bg-green-100"
+  },
+  {
+    "titulo": "Concluído",
+    "exibirBotaoCriarTarefas": true,
+    "corDeFundo": "bg-green-200"
+  }
+]
