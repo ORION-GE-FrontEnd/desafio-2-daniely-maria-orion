@@ -5,13 +5,14 @@ interface ListaDeTarefasProps {
   titulo: string;
   exibirBotaoCriarTarefas?: boolean;
   corDeFundo?: string;
+  tarefas?: TarefaData[]
 }
 
 interface TarefaData {
   id: number;
   title: string;
   description: string;
-  completed: boolean; // Pode ser mantido para compatibilidade
+  completed: boolean;
   status: 'A fazer' | 'Em Andamento' | 'Em Revisão' | 'Concluído';
 }
 
@@ -20,8 +21,9 @@ const ListaDeTarefas: React.FC<ListaDeTarefasProps> = ({
   exibirBotaoCriarTarefas = true,
   corDeFundo
 }) => {
-  const [tarefas, setTarefas] = useState<TarefaData[]>(
-    tarefasJson.todos.map((tarefa: any) => ({
+  
+const [tarefas, setTarefas] = useState<TarefaData[]>(
+    tarefasJson.todos.map((tarefa: string) => ({
       ...tarefa,
       status: tarefa.completed ? 'Concluído' : 'A fazer' // Conversão inicial
     }))
