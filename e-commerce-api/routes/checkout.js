@@ -2,10 +2,11 @@ const express = require('express');
 const router = express.Router();
 
 let products = require('../data/products'); 
-let cart = require('./cart').cart;
+let cartModule = require('./cart');
+let cart = cartModule.cart; // Corrigido: pega referência real do carrinho
 let orders = []; 
 
-//geradora de ids
+// Geradora de IDs
 const generateOrderId = () => {
   const maxId = orders.length > 0
     ? Math.max(...orders.map(o => parseInt(o.orderId) || 0))
@@ -13,8 +14,8 @@ const generateOrderId = () => {
   return (maxId + 1).toString();
 };
 
-//iniciar o checkout
-router.post('/', (req, res) => {
+// Iniciar o checkout
+router.post('/checkout', (req, res) => {
   const { paymentMethod, address } = req.body;
 
   if (cart.length === 0) {
@@ -32,7 +33,6 @@ router.post('/', (req, res) => {
   for (const cartItem of cart) {
     const product = products.find(p => p.id === cartItem.productId);
     if (!product) {
-      console.error(`Erro: Produto ID ${cartItem.productId} no carrinho não encontrado no catálogo.`);
       return res.status(500).json({ error: `Erro interno: Produto ID ${cartItem.productId} no carrinho não encontrado no catálogo.` });
     }
     if (product.stock < cartItem.quantity) {
@@ -52,15 +52,16 @@ router.post('/', (req, res) => {
   const newOrder = {
     orderId: generateOrderId(),
     items: orderItems,
-    totalAmount: totalAmount,
+    totalAmount,
     status: 'processing',
-    paymentMethod: paymentMethod,
-    address: address,
+    paymentMethod,
+    address,
     createdAt: new Date().toISOString(),
     _stockChanges: stockChanges
   };
 
   orders.push(newOrder);
+  cart.splice(0, cart.length); // esvaziar o carrinho
 
   res.status(202).json({
     orderId: newOrder.orderId,
@@ -69,8 +70,8 @@ router.post('/', (req, res) => {
   });
 });
 
-//confirma o pagamento
-router.post('/:orderId/confirm', (req, res) => {
+// Confirmar o pagamento
+router.post('/checkout/:orderId/confirm', (req, res) => {
   const orderId = req.params.orderId;
   const { paymentStatus } = req.body;
 
@@ -80,7 +81,7 @@ router.post('/:orderId/confirm', (req, res) => {
     return res.status(404).json({ error: 'Pedido não encontrado.' });
   }
 
-  if (order.status === 'paid' || order.status === 'cancelled' || order.status === 'failed') {
+  if (['paid', 'cancelled', 'failed'].includes(order.status)) {
     return res.status(400).json({ error: `O pedido já está no status ${order.status}.` });
   }
 
@@ -96,7 +97,7 @@ router.post('/:orderId/confirm', (req, res) => {
     }
     delete order._stockChanges;
 
-    cart.splice(0, cart.length); 
+    cart.splice(0, cart.length);
 
     res.status(200).json({
       message: 'Pagamento confirmado',
@@ -115,8 +116,8 @@ router.post('/:orderId/confirm', (req, res) => {
   }
 });
 
-// visualizar um pedido
-router.get('/:orderId', (req, res) => {
+// Visualizar um pedido
+router.get('/orders/:orderId', (req, res) => {
   const orderId = req.params.orderId;
   const order = orders.find(o => o.orderId === orderId);
 
@@ -142,3 +143,8 @@ router.get('/:orderId', (req, res) => {
 });
 
 module.exports = router;
+
+// Para testes:
+module.exports.orders = orders;
+module.exports.cart = cart;
+module.exports.products = products;
