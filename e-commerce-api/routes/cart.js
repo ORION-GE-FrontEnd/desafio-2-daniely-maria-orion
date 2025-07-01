@@ -199,3 +199,6 @@ router.delete('/', (req, res) => {
 });
 
 module.exports = router;
+// para realizar os testes
+module.exports.cart = cart;
+module.exports.products = products;
