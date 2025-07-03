@@ -23,9 +23,9 @@ const ListaDeTarefas: React.FC<ListaDeTarefasProps> = ({
 }) => {
   
 const [tarefas, setTarefas] = useState<TarefaData[]>(
-    tarefasJson.todos.map((tarefa: string) => ({
+    tarefasJson.todos.map((tarefa: any) => ({
       ...tarefa,
-      status: tarefa.completed ? 'Concluído' : 'A fazer' // Conversão inicial
+      status: tarefa.completed ? 'Concluído' : 'A fazer'
     }))
   );
 
@@ -44,7 +44,6 @@ const [tarefas, setTarefas] = useState<TarefaData[]>(
     }
   };
 
-  // Agora filtra com base no status
   const tarefasFiltradas: TarefaData[] = tarefas.filter(
     tarefa => tarefa.status === titulo
   );
@@ -83,30 +82,33 @@ const [tarefas, setTarefas] = useState<TarefaData[]>(
   };
 
   return (
-    <div className={`rounded-lg p-4 shadow-md ${corDeFundo}`}>
-      <h2 className="text-lg font-semibold mb-4">{titulo}</h2>
+    <div className={`rounded-lg p-4 shadow-md ${corDeFundo}`} data-cy={`lista-${titulo.toLowerCase().replace(/\s/g, '-')}`}>
+      <h2 className="text-lg font-semibold mb-4" data-cy={`titulo-lista-${titulo.toLowerCase().replace(/\s/g, '-')}`}>{titulo}</h2>
 
-      <ul className="space-y-2 mb-4">
+      <ul className="space-y-2 mb-4" data-cy={`lista-itens-${titulo.toLowerCase().replace(/\s/g, '-')}`}>
         {tarefasFiltradas.length > 0 ? (
           tarefasFiltradas.map(tarefa => (
             <li
               key={tarefa.id}
               className="bg-gray-100 p-3 rounded shadow-sm flex justify-between items-start gap-3"
+              data-cy={`tarefa-item-${tarefa.id}`}
             >
               <div>
-                <h3 className="font-semibold">{tarefa.title}</h3>
+                <h3 className="font-semibold" data-cy={`tarefa-titulo-${tarefa.id}`}>{tarefa.title}</h3>
                 <p className="text-sm text-gray-700">{tarefa.description}</p>
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={() => handleEditarTarefa(tarefa.id)}
                   className="text-blue-500 hover:underline text-sm"
+                  data-cy={`editar-tarefa-${tarefa.id}`}
                 >
                   Editar
                 </button>
                 <button
                   onClick={() => handleExcluirTarefa(tarefa.id)}
                   className="text-red-500 hover:underline text-sm"
+                  data-cy={`excluir-tarefa-${tarefa.id}`}
                 >
                   Excluir
                 </button>
@@ -114,7 +116,7 @@ const [tarefas, setTarefas] = useState<TarefaData[]>(
             </li>
           ))
         ) : (
-          <li className="text-gray-400 italic">Nenhuma tarefa encontrada.</li>
+          <li className="text-gray-400 italic" data-cy={`no-tasks-${titulo.toLowerCase().replace(/\s/g, '-')}`}>Nenhuma tarefa encontrada.</li>
         )}
       </ul>
 
@@ -126,6 +128,7 @@ const [tarefas, setTarefas] = useState<TarefaData[]>(
             shadow-md rounded transition duration-200 ease-in-out
             ${corDoBotao(titulo)}
           `}
+          data-cy={`criar-tarefa-button-${titulo.toLowerCase().replace(/\s/g, '-')}`}
         >
           + Criar nova tarefa
         </button>
